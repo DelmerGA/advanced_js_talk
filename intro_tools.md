@@ -125,12 +125,13 @@ Now we can run our `grunt` script.
 	```
 	grunt.registerTask("greet", "creates a greeting.txt file", function () {
 		var name = grunt.option("name") || "World";
-		var text = grunt.template.process("Hello, <%= name %>", {data: {name: name });
+		var text = grunt.template.process("Hello, <%= name %>", {data: {name: name }});
 		grunt.file.write("greeting.txt", text);
 	})
 	```
 	
-	Then run it using `grunt greet --name="john doe"
+Then run it using `grunt greet --name="john doe"`
+
 
 ------
 
@@ -144,15 +145,100 @@ Alternatively, you could just install `grunt` locally and use `npm` to kickoff e
     ...
 }
 
+
 ```
 
 paired with some type of build command in NPM
 
 ```
 "scripts": {
-	"build": "npm install && grunt"
+	"build": "npm install && grunt",
+	"grunt": "grunt"
 }
 ```
 
-----
+Then you can use npm to run this 
+
+```
+npm run grunt -- greet --name="joe"
+```
+
+
+------
+
+ You can also use `grunt` packages to setup common build tasks. Let's setup a build task for our CSS.
+ 
+ 1.) First install a `grunt-contrib-cssmin` library.
+ 
+ 2.) Then load it into your application
+ 
+```
+	grunt.loadNpmTasks("grunt-contrib-cssmin");
+	
+
+
+```
+ 	
+ 3.) Next configure it to read your `css` files.
+ 
+  ```
+	 
+	  grunt.config('cssmin', {
+	    combine: {
+	      files: {
+	        'public/stylesheets/app.min.css': [
+	          'public/stylesheets/**/*.css'
+	        ]
+	      }
+	    }
+	  });
+	 
+  ```
+  
+ 
+4.) Now just run the grunt minification command, `grunt cssmin`
+
+
+### More Grunt
+
+
+As you add more libraries you'll have one big config object instead of configuring each task individually.
+
+```
+	grunt.initConfig({
+		cssmin: {
+			combine: {
+	      		files: {
+	       		 	'public/stylesheets/app.min.css': [
+	        	 		 'public/stylesheets/**/*.css'
+	        		]
+	      		}
+	      	}
+		},
+		watch: {
+			files: [
+				'public/stylesheets/**/*.css'
+			],
+			tasks: [default]
+		}
+	});
+	
+	grunt.registerTask("clean", function () {
+		grunt.file.delete('public/stylesheets/app.min.css');
+	})
+	
+	grunt.registerTask("default", ["clean", "cssmin", "watch"])
+```
+
+You'll also want to install `load-grunt-tasks`, and the following to your project.
+
+```
+ require('load-grunt-tasks')(grunt, {
+    pattern: 'grunt-*',
+    scope: 'devDependencies'
+  });
+  
+```
+
+
 
