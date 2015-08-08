@@ -22,7 +22,7 @@
   * Stages: Build, Clean, etc (~15mins)
   * Minifying JS (~5mins)
   * Watching and Playing w/  Other Contribs (~15mins)
-* Talk Browserify (~30mins)
+* [Talk Browserify](tools/browserify.md) (~30mins)
   * The CLI (~10mins)
   * Integrate w/ Grunt (~10mins)
   * Using Node Modules
