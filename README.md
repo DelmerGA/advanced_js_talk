@@ -3,7 +3,7 @@
 
 
 * Install (~ 10mins)
-  * See he [install instructions](install.md)
+  * See the [install instructions](install.md)
 * Quick Review: Node & NPM (~25mins)
   * [Require, Export, and All That](intro_node.md)
 * Building A Node App w/ Express (~3hrs)
@@ -28,7 +28,13 @@
   * Using Node Modules
 
 
+## Recommended Readings
 
+* [Grunt Getting Started](http://gruntjs.com/getting-started)
+* [NPM SCRIPTS!](http://blog.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/)
+* [Browserify Handbook](https://github.com/substack/browserify-handbook#introduction)
+* [Browserify Usage](https://github.com/substack/node-browserify#usage)
+* [Browserify Getting Started](http://www.sitepoint.com/getting-started-browserify/)
 
 
 
