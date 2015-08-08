@@ -7,7 +7,7 @@
 * Quick Review: Node & NPM (~25mins)
   * [Require, Export, and All That](intro_node.md)
 * Building A Node App w/ Express (~3hrs)
-  * [Routing, Params, and Web Basics](intro_expres.md) (~30 mins)
+  * [Routing, Params, and Web Basics](intro_express.md) (~30 mins)
   * [Templating Views And Server State: CRUD](intro_express_part_2.md)(~1hr+/-10mins)
   * [Using Mongo And Model CRUD](intro_express_part_3.md)(~40mins)
   * [Creating And Showing Todos](intro_express_part_4.md) (20mins)
