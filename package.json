@@ -1,6 +1,29 @@
 {
-  "scripts": {
+  "name": "advanced_js_talk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "config": {
+    "greeting": "hello world"
   },
+  "scripts": {
+    "greet": "echo $npm_package_config_greeting",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DelmerGA/advanced_js_talk.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DelmerGA/advanced_js_talk/issues"
+  },
+  "homepage": "https://github.com/DelmerGA/advanced_js_talk",
   "dependencies": {
+    "express": "^4.13.3"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5"
   }
 }

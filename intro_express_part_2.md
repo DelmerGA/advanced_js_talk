@@ -1,291 +1,580 @@
 # More Express
-## Views and Post Data
+## CRUD And AJAX
 
 | Objectives |
 | :---- |
-| Send static and templated HTML responses back to the client |
-| handle and parse form posts from the client. |
-| discuss and review HTTP fundamentals  |
+| Review and apply `AJAX` requests with our **Express** application |
+| Review and apply DOM manipulation techniques using jQuery. |
+| Review CRUD in **Express** to send JSON responses to the server |
+
+## Outline
+
+We want to build a **TODO** application today.
+
+[Something like this](http://todomvc.com/examples/jquery/#/all)
 
 
-**Directions**: create an `express_examples/` directory somewhere on your machine to follow along.
+* Review related topics
+* Setup Todo Application Directory
+* Setup A Simple Hello World
+  * Render A `home.html` file
+  * Add `jQuery`
+* Make a JSON `GET /todos` route
+  * Use AJAX to get all `todos`.
+* Make a JSON `POST /todos` route
+  * Use AJAX to create new `todos`.
 
-## Baseline
+## Background
 
-Let's start with something familiar.
+* [jQuery](ajax_style.md)
+* [jQuery Ajax](ajax_style.md#ajax)
 
-`app.js`
+
+### Quick Questions
+
+AJAX Related
+
+* What does **AJAX** stand for?
+  * Asynchronous JavaScript And XML
+* What's the point of **AJAX**?
+  * To make requests to a server to dynamically load content into the page or make changes on the server.
+* What is `JSON`?
+  * **JavaScript Object Notation**: it's just the representation of data using curlies and square brackets: arrays and objects.
+
+Express Related
+
+* What is a web application framework?
+  * A library that helps interact with a server to setup easy ways to route request, setup middleware, etc.
+* What is Express?
+  * Express is a web application framework built to work with the built in Node HTTP server.
+* What is Node.js?
+  * Node.js or Node is a library that has bunch of utilities to not only allow us to run javascript, but also interact with our operating system and setup a server.
+
+HTTP Related
+
+* What is a `GET` type request?
+* What is a `POST` type request?
+* What is the main difference between the two?
+
+
+## Getting Started
+
+Let's setup your application directory:
+
+```bash
+mkdir todo_app
+cd todo_app
+
+touch index.js
+
+mkdir views
+```
+
+Next initialize an *npm* project and install `express` and `body-parser`.
 
 ```
-var express = require('express'),
-  app = express();
+npm init
+npm install --save express body-parser
+```
 
-app.get('/', function(req, res){
-  res.send('Hello world!');
+Create a simple `index.js` file for your application.
+
+`index.js`
+
+```
+var express = require("express"),
+  bodyParser = require("body-parser"),
+  path = require("path");
+
+var app = express();
+
+app.get("/", function (req, res) {
+  res.send("Hello World");
 });
 
 app.listen(3000, function () {
-   console.log("Up and running!");
+  console.log("Running");
 });
 ```
 
-This is something that sends static text back to the client.
 
-Try the above example, copy it, and type the following into your terminal. 
+Make sure this much is running by going [localhost:3000](localhost:3000)
 
-```bash
-echo "{}" > package.json
-npm install express
-pbpaste | node
-```
 
-or as an alternative
+## Sending A File
+
+Instead of sending a `Hello World` response. Let's instead send a `home.html` in our `views/` directory.
 
 ```bash
-mkdir example_1/
-cd example_1/
-pbpaste > index.js
-node index.js
+touch views/home.html
 ```
 
-Your server should be up and running. You can now curl it to see the response.
+Let's add the usual boilerplate HTML.
 
+```html
 
-```bash
-curl -i localhost:3000/
-```	
-
-You should see something like the following:
-
-
-```bash
-HTTP/1.1 200 OK
-X-Powered-By: Express
-Content-Type: text/html; charset=utf-8
-Content-Length: 12
-ETag: W/"c-1b851995"
-Date: Sat, 02 May 2015 22:10:13 GMT
-Connection: keep-alive
-
-Hello world!
-```
-
-or in the browser you should see the following:
-
-![snapshots/example_1](snapshots/example_1.png)
-
-
-### Views 
-
-Fistly, we cannot keep using `res.send` to send a response. It would be much more efficient to store them in files. Let's make a folder, `/views`, and create an `index.html` page inside.
-
-```
-<!doctype html>
-
+<!DOCTYPE html>
 <html>
-  <head>
+<head>
+  <title>Todo App</title>
   </head>
   <body>
-    Hello world!
+    Welcome!
   </body>
 </html>
 ```
 
-and let's modify the `index.js` to use this file via `res.sendFile`.
+Let's add logic to our **root** route to send this file.
 
-`index.js`
+```javascript
 
-```
-var express = require('express'),
-	path = require('path'),
-  	app = express();
+var views = path.join(process.cwd(), "views");
 
-app.get('/', function(req, res){
-  // use a render
-  res.sendFile(path.join(__dirname,'views', 'index.html'));
+app.get("/", function (req, res) {
+  var homePath = path.join(views, "home.html");
+  res.sendFile(homePath);
 });
-app.listen(3000)
 ```
 
-The above `strategy` might become tiresome as we keep having to specify our `./views/` folder path to the `res.sendFile` method. Let's create an `options` parameter to use with `res.sendFile`.
+Go to [localhost:3000](localhost:3000/) and verify it is working as expected.
+
+## Adding Assets
+
+We want to be able to use assets in our application, but we'll need a directory to put them in. Let's make some directories.
+
+```bash
+mkdir public
+mkdir public/javascripts
+mkdir public/stylesheets
+mkdir public/images
+```
+
+Let's make a quick `app.css` file for your todo application.
+
+`public/stylesheets/app.css`
+
+```css
+body {
+  background-color: gray;
+}
+```
+
+Then we want to let our application know about this new asset directory. Add the following to your `index.js`.
+
+
+```javascript
+app.use(express.static("public"))
+```
+
+Now we just need to add a **CSS** link in our `home.html`.
+
+```html
+<head>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/app.css">
+</head>
+```
+
+Now we can test that this working by going to the [localhost:3000/](localhost:3000/).
+
+
+## Bower
+
+See this link for starting with [Bower](intro_to_bower.md)
+
+### Installing jQuery
+
+We want to be able to interact with jQuery on our `home.html` page. To do this we need to add a static asset server for jQuery.
+
+```javascript
+// so you can use public
+app.use(express.static("public"));
+// so you can use bower
+app.use(express.static("bower_components"));
+```
+
+Next we want to actually install jQuery.
+
+```bash
+bower install jquery
+```
+and now we just need to add the `<script>` tag to our `home.html`.
+
+```html
+  <script type="text/javascript" src="/jquery/dist/jquery.js"></script>
+
+```
+
+### Thus Far
+
+`views/home.html`
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo App</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/app.css">
+    <script type="text/javascript" src="/jquery/dist/jquery.js"></script>
+  </head>
+  <body>
+    HELLO WORLD
+
+  </body>
+</html>
+```
 
 
 `index.js`
 
+```javascript
+
+var express = require("express"),
+  bodyParser = require("body-parser"),
+  path = require("path");
+
+var app = express();
+
+app.use(express.static("public"));
+app.use(express.static("public"));
+
+var views = path.join(process.cwd(), "views");
+
+app.get("/", function (req, res) {
+  var homePath = path.join(views, "home.html");
+  res.sendFile(homePath);
+});
+
+app.listen(3000, function () {
+  console.log("Running");
+});
 ```
-var express = require('express'),
-	path = require('path'),
-  	app = express();
 
 
-// our special little middleware
-app.use(function (req, res, next) {
-	console.log("running");
-	res.sendOps = {
-						root: path.join(__dirname, "views")
-					};
-	res.sendHTML = function (fname, cb) {
-		if (path.extname(fname) !== '.html') {
-			fname += '.html';
-		}
-		res.sendFile(fname, res.sendOps, cb || function (err) {
-			if (err) {
-				res.status(err.status).end();
-			} else {
-				console.log("Sent:", fname)
-			}
-		});
-	};
-	next();
+If you're having problems with seting up Bower then you should use a CDN for the remainder of this project. However, you should verify that your **CSS** is working before continueing.
+
+### Client Side JS
+
+We want to create an `public/javascripts/app.js` file that will have a majority of our application logic. Let's do that.
+
+```bash
+touch public/javascripts/app.js
+```
+
+And let's add some test code inside.
+
+`public/javascripts/app.js`
+
+```javascript
+$(function () {
+  alert("The Page Has Loaded!");
+});
+```
+
+Now we just need to make sure it properly linked with a script tag.
+
+`views/home.html`
+
+```html
+<script type="text/javascript" src="javascripts/app.js"></script>
+```
+
+**NOTE**: make sure your script tag above is below where you put jQuery.
+
+
+## Reading Todos
+
+* **Our first goal is to have `todos` on the server that we can render on the client side**
+
+Let's add a `todos` array in our `index.js` with some example todo objects.
+
+`index.js`
+
+```javascript
+
+var todos = [
+              {
+                index: 0,
+                title: "Finish Laundry",
+                description: "two loads left",
+                completed: false
+              },
+              {
+                index: 1,
+                title: "Go To Gym",
+                description: "Leg Day",
+                completed: false
+              }
+            ];
+
+```
+
+
+Now let's add a route to send all the todos when requested.
+
+`index.js`
+
+```javascript
+app.get("/todos", function (req, res) {
+  res.send(todos);
+});
+```
+
+
+Go to [/todos](localhost:3000/todos) to view all todos.
+
+
+### Using AJAX
+
+We now have a route to send all `todos` it's just a matter of adding jQuery to our `javascripts/app.js` that will make a request to our server to grab them.
+
+
+`public/javascripts/app.js`
+
+```javascript
+$(function () {
+  $.get("/todos").
+    done(function (data) {
+      console.log("RECEIVING RESPONSE");
+      console.log("DATA", data);
+    })
+});
+```
+
+You should see `todos` logged in your dev console in the browser.
+
+
+### Appending The Todos
+
+Let's go through `each` todo in the `data` and `append` them to the page.
+
+`public/javascripts/app.js`
+
+```javascript
+$(function () {
+  $.get("/todos").
+    done(function (data) {
+
+      console.log("RECEIVING RESPONSE");
+      console.log("DATA", data);
+
+      $(data).each(function (index, todo) {
+        var $todo = $("<div>").html(todo.title)
+        $("body").append($todo);
+      });
+
+    });
+});
+
+```
+
+We should now see todos on the page.
+
+## Exercises
+
+* Add a `div` to the `views/home.html` with class `todosCon` -- a todos container. Then `append` each `todo` to it.
+
+* Before you `append` each new `todo` to the page give it a class of `todo`.
+
+* Add some css for a the class `todo` in your `app.css`. Give each `todo` a border of `1px`.
+
+
+## Making Todos
+
+* **Our goal now that is to now to be able to send `POST` requests to our server to add new todos, and then add them to the page**
+
+
+First we will need to add a trust form to our `views/home.html`
+
+```html
+<form id="newTodo">
+  <input type="text" name="todo[title]">
+  <textarea name="todo[description]"></textarea>
+  <button>Save Todo</button>
+</form>
+
+```
+
+**NOTE**: we don't care about the `action` and `method` for this form because we are going to use jQuery to submit it.
+
+Let's add some javascript to listen for the form to submit.
+
+```javascript
+
+  $("#newTodo").on("submit", function (e) {
+    var $this = $(this);
+    var formData = $this.serialize();
+    console.log(formData);
+    $.post("/todos", formData).
+      done(function (data) {
+        console.log("Success!");
+      });
+  });
+
+```
+
+However, keep in mind that we don't yet have a route on the backend to receive this post. 
+
+To receive a `POST` on the backend we will need to use `body-parser`.
+
+`index.js`
+
+```javascript
+app.use(bodyParser.urlencoded({extended: true}))
+```
+
+Then we want to add a route to handle the post and grab the required params.
+
+`index.js`
+
+```javascript
+app.post("/todos", function (req, res) {
+  var todo = req.body.todo; 
+  todo.index = todos.length;
+
+  todos.push(todo);
+  res.send(todo);
+});
+```
+
+There we go. We should be all set for submitting `newTodo` data to the server.
+
+## Exercise 
+
+* When the data comes back from the server append it to the page. 
+
+
+## Templating w/ JST
+
+In order to start templating on the front-end with JST we need a library that will do this templating for us. Let's install `underscore`.
+
+```bash
+bower install underscore
+```
+
+Then we can include underscore in our html.
+
+```html
+<script type="text/javascript" src="underscore/underscore.js"></script>
+```
+
+Now we just need to create a template for our Todo. We can do this by placing our todo template inside of a script tag at the bottom of our html. You can place right after the closing `</body>` tag.
+
+
+```html
+<script id="todoText" type="text/html">
+  <div class='todo'>
+    <h2><%= title %></h2>
+    <p>
+      <%= todo.description %>
+    </p>
+    <input type="checkbox" class="complete-box" <%= completed ? "checked": ""> >
+  </div>
+</script>
+```
+
+This style of templating is called JST. It allows you to quite a number of things you'd normally do in JS. Be careful about adding to much logic into it.
+
+The last thing we want to do is render our todos form earlier using it.
+
+* First we will need to fetch the `todoTemplate` from the script template and then turn it into a template.
+
+  ```javascript
+  $(function () {
+
+      var todoText = $("#todoText").html()
+      var todoTemplate = _.template(todoText);
+
+
+      // your old content should
+      // be below
+
+    })
+
+  ```
+
+* Then we want to use it to render data.
+
+  ```javascript
+    $.get("/todos")
+      .done(function (data) {
+        $.each(function (index, todo) {
+          var $todo = $(todoTemplate(todo));
+          $("body").append($todo);
+        })
+      });
+  ```
+
+
+## Exercise
+
+* Try this for rendering a new created todo.
+
+
+## Complete
+
+We want to be able to update a task. For this we will need to send an `PUT` request to our server. This type of request indicates an update. However, it will also require us to use the `$.ajax` method. It will also require us to be able to identify posts we click on.
+
+
+* Let's start by adding some data like the `index` of our todo to a `data` attribute, so we can look it up later for that element.
+
+```javascript
+    $.get("/todos")
+      .done(function (data) {
+        $.each(function (index, todo) {
+          var $todo = $(todoTemplate(todo));
+
+          // add the index to the 
+          // tracked data
+          $todo.data("index", todo.index);
+          $("body").append($todo);
+        })
+      });
+```
+
+* Let's now watch for a click on a `.todo .complete-box` and grab that `index` so we can do an update to the server.
+
+```javascript
+
+$("body").on("click", ".todo .complete-box", function (event) {
+  var $box = $(this);
+  var $todo = $box.closest(".todo");
+  console.log("UPDATE", $todo.data("index"));
+  var isComplete = $box.prop("checked"); 
+
+  // then make ajax request
 })
 
-app.get('/', function(req, res){
-  res.sendHTML("index")
+```
+
+* Now we can add some quick `$.ajax` to make the update.
+
+```javascript
+    $.ajax({
+      url: "/todos/" +index,
+      type: "put",
+      data: {
+        todo: {
+          completed: isComplete
+        }
+      }
+    }).done(function (data) {
+      console.log("UPDATED!")
+      $box.prop("checked", data.completeds)
+    });
+```
+
+* Finally, we just need a route to catch the update.
+
+
+```javascript
+
+app.put("/todos/:index", function (req, res) {
+  var todo_data = req.body.todo
+  var index = req.params.index;
+
+  var todo = todos[index];
+  todo.complete = todo_data.completed;
+
+  res.send(todo)
 });
-
-app.listen(3000)
-
-```
-
-We could also use Express' built in `app.engine` feature to create a rendering engine for particular responses. Let's create one that reads a file and sends it to the client for all HTML.
-
-`index.js`
-
-```
-var express = require('express'),
-	path = require('path'),
-	fs = require('fs'),
-  	app = express();
-
-app.engine('html', function () {
-	var args = Array.prototype.slice.call(arguments);
-	var path = args.shift()
-	var cb = args.pop();
-	var file = fs.readFileSync(path).toString();
-	cb(null, file);
-});
-
-app.get('/', function(req, res){
-  // use a render
-  res.render("index.html")
-});
-app.listen(3000)
-```
-
-We could use underscores templating functionality to help us render templated html responses.
-
-
-`index.js`
-
-```
-var express = require('express'),
-	path = require('path'),
-	fs = require('fs'),
-	_ = require("underscore"),
-  	app = express();
-  	
-
-app.engine('html', function () {
-	var args = Array.prototype.slice.call(arguments);
-	var path = args.shift();
-	var data = args.shift();
-	var cb = args.pop();
-	var file = fs.readFileSync(path).toString();
-	var temp = _.template(file);
-	cb(null, temp(data));
-});
-
-app.get('/', function(req, res){
-  // use a render
-  res.render("index.html", {greeting: "Hello"})
-});
-app.listen(3000)
-```
-
-### BodyParser
-
-The next thing we need to get ready for is parsing params from a form, which you need an external module for called `body-parser`.
-
-`app.js`
-
-```
-var express = require('express'),
-  bodyParser = require('body-parser'),
-  app = express();
-
-// assuming some middleware to render html responses
-
-var examples = [];
-
-// tell your app to use the module
-app.use(bodyParser.urlencoded({extended: true}));
-
-app.get('/', function(req, res){
-  // use a render
-  res.render('index.html');
-});
-
-app.post("/examples", function (req, res) {
-  examples.push(res.body.example)
-  res.redirect("/examples");
-});
-
-
-app.get("/examples", function (req, res) {
-  res.send(examples);
-});
-
-```
-
-where `index.html` has a form like the following:
-
-```
-
-<form method="GET" action="/examples">
-	<input type="text" name="example[title]">
-	<input type="text" name="example[description]">
-	<button>Save</button>
-</form>
-```
-
-
-### More Templating
-
-We might need to render some data into our views, so we'll also need a module for this, `ejs`. To do this change `index.html` to `index.ejs`.
-
-
-`app.js`
-
-```
-var express = require('express'),
-  bodyParser = require('body-parser'),
-  ejs = require('ejs'),
-  app = express();
-
-// tell your app to use the module
-app.use(bodyParser.urlencoded())
-
-app.set('view engine', 'ejs');
-
-app.get('/', function(req, res){
-  // use a render
-  res.render('index.ejs', {name: "Ruby Rud"});
-});
-
-```
-
-then we need to update our `index.ejs` to use a templating variable.
-
-`index.ejs`
-
-```
-<!doctype html>
-
-<html>
-  <head>
-  </head>
-  <body>
-    Hello, <%= name %>!
-  </body>
-</html>
 ```

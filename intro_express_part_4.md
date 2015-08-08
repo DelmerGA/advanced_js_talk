@@ -1,563 +1,188 @@
-# More Express
-## Authentication and All That
+# Todo Refactor
+## Adding Mongo
+
+| Objective |
+| :----- |
+| Take an existing application and review CRUD |
+| Review Mongoose CRUD operations |
+| Apply Mongoose CRUD to an existing in memory application to add persistence |
 
 
-| Objectives |
-| :---- |
-| Review and apply the a simple password **authentication** strategy |
-| Utilize in memory storage and cookies to create an Express application with Sessions |
-| A simple sign and signout process |
+## Reviewing
 
-
-## Background (10mins)
-
-Review Sign Up Together
-
-Explain in your own way -- using pictures, diagrams, words, dance, etc...
-
-* What is **Authentication**?
-* Why do we **hash** passwords?
-* What's the general idea when someone sign's up for a site?
-* What is HTTPS? Why should we care about this?
-
-
-## Implementing **Simple Signup** Scheme
-
-**Question**: *What will we need to do a simple sign up?*
-
-* Express Framework: build our application and handle requests
-* Middleware:
-  * 'body-parser': for handling incoming form data.
-  * (maybe) 'ejs': if we want to **render** or **template** views
-  * (maybe) 'method-override': if we want to **PUT** or **DELETE** something.
-* Models:
-  * Mongoose Models: performing CRUD with Mongo
-* bcryptJS: Do you know who [Bruce Schneier](http://www.schneierfacts.com/facts/1101) is!!!!???!?
-
-### Getting Setup (7mins)
-
-
-Set yourself up with a project folder.
-
-```bash
-mkdir simple_login
-cd simple_login
-
-touch package.json
-touch app.js 
-
-subl .
-```
-
-At our very least we need something like the following:
-
-`simple_login/app.js`
-
-```js
-var express = require('express'),
-    bodyParser = require('body-parser'),
-    app = express();
-
-app.use(bodyParser.urlencoded({extended: true}))
-
-app.get("/signup", function (req, res) {
-  res.send("Coming soon");
-});
-
-app.listen(3000, function () {
-  console.log("SERVER RUNNING");
-});
-```
-
-The above won't run unless we install those dependencies, so let's go ahead and make sure we do that now. 
-
-#### Exercise 1
-
------------
+Let's make a `models` file. This file will store all of our model definitions. Later we will have to separate this into multiple files.
 
 ```
-npm install --save express body-parser
+touch models.js
 ```
 
-* What happened? Why?
+And let's define our `Todo` model inside of it.
 
->  The problem is there is nothing in our `package.json` file.
-
-Let's put something minimal in there.
-
-`simple_login/package.json`
-
-```js
-{}
-```
-
-Now let's try to install
-
-```
-npm install --save express body-parser
-```
-
-
---------------
-
-#### Exercise 2
-
--------
-Run your `app.js` file using `nodemon`
-
-* What happens? What needs to be updated? Why?
-
--------
-
-
-
-
-### Setting Up `Mongo`
-
-Now we don't have models yet so that's as good as any place as any to start.
-
-
-#### Exercise
-
-1. Write a `userSchema` for your Users. It should have the following: **email**, **firstname**, **lastname**, **passwordDigest**.
-2. Define a `User` model using your `userSchema`.
-
-
-#### Creating A User Model
-
-Let's begin with a more organized approach.
-
-```
-mkdir models
-touch models/index.js
-touch models/user.js
-```
-
-Let's write some logic in our `models/index`.
-
-
-`index.js`
-
-```
-module.exports.User = require("./user");
-```
-
-Let's add some code for our `User`.
 
 ```javascript
-
-var bcrypt = require("bcrypt");
-var salt = bcrypt.genSaltSync(10);
 var mongoose = require("mongoose");
-
-var userSchema = new mongoose.Schema({
-  email: String,
-  passwordDigest: String
-});
-
-userSchema.statics.createSecure = function (params, cb) {
-  var that = this;
-  bcrypt.genSalt(function (err, salt) {
-    bcrypt.hash(params.password, salt, function (err, hash) {
-      console.log(hash);
-      that.create({
-        email: params.email,
-        passwordDigest: hash
-       }, cb)
-    });
-  })
-};
-
-userSchema.statics.encryptPassword = function (password) {
-   var hash = bcrypt.hashSync(password, salt);
-   return hash;
- };
-
-
-userSchema.statics.authenticate = function(email, password, cb) {
-  this.find({
-     email: email
-    }, 
-    function(err, user){
-      if (user === null){
-        throw new Error("Username does not exist");
-      } else if (user.checkPassword(password)){
-        cb(null, user);
-      }
-
-    })
- }
-userSchema.methods.checkPassword: function(password) {
-        return bcrypt.compareSync(password, this.passwordDigest);
-};
-
-
-var User = mongoose.model("User", userSchema);
-
-module.exports = User;
+mongoose.connect("mongodb://localhost/todos_app");
 
 ```
 
-Be sure to install bcrypt
+However these three lines assume we already have `mongoose` already installed. We should install it before we forget. It's hard to remember what you need to install before you need it, but once you realize you do, then you should take that opportunity to do it.
 
 ```bash
-npm install --save bcrypt
+npm install --save mongoose
 ```
 
 
-### Creating A User
-
-Let's go into the node terminal to play with our model.
-
-```javascript
-var db = require("./models");
-db.User.
-  createSecure("foobar", "foobar", function(err, user){
-    console.log("success!", user);
-  });
-```
-
-
-### Putting It Together
-
-Let's add our models to our app.
-
-`simple_login/app.js`
-
-```js
-var express = require('express'),
-    bodyParser = require('body-parser'),
-    db = require("./models"),
-    app = express();
-
-
-```
-
-Let's add a `POST /users` route to accept user signup requests.
-
-```javascript
-// where the user submits the sign-up form
-app.post("/users", function (req, res) {
-
-  // grab the user from the params
-  var user = req.body.user;
-
-  // create the new user
-  db.User.
-    createSecure(user.email, user.password,
-    function(){
-        res.send("SIGNED UP!");
-      });
-});
-
-```
-
-
-The complete code is just the following:
-
-
-`simple_login/app.js`
+Great! We can now define our `Todo` Schema.
 
 
 ```javascript
-var express = require('express'),
-    bodyParser = require('body-parser'),
-    db = require("./models"),
-    app = express();
 
-app.use(bodyParser.urlencoded({extended: true}))
+var mongoose = require("mongoose");
+mongoose.connect("mongodb://localhost/todos_app");
 
-app.get("/signup", function (req, res) {
-  res.send("Coming soon");
-});
-
-// where the user submits the sign-up form
-app.post("/users", function (req, res) {
-
-  // grab the user from the params
-  var user = req.body.user;
-
-  // create the new user
-  db.User.
-    createSecure(user.email, user.password, 
-    function(){
-        res.send("SIGNED UP!");
-      });
-});
-
-app.listen(3000, function () {
-  console.log("SERVER RUNNING");
-});
-```
-
-```bash
-curl --data "user[email]=foobar&user[password]=foobar" localhost:3000/users
-
-```
-
-## Logging In: Part 1 -- Setup
-
-Let's add some routes to be able to login.
-
-`simple_login/app.js`
-
-```javascript
-
-app.post("/login", function (req, res) {
-  var user = req.body.user;
-
-  db.User
-    .authenticate(user.email, user.password, 
-    function (err, user) {
-          res.send(user);
-    });
-});
-
-```
-
-Then test the route
-
-```
-curl --data "user[email]=foobar&user[password]=foobar" localhost:3000/login
-
-```
-
-### Creating Sessions
-
-To introduce sessions we will need the `express-session` middleware.
-
-```bash
-npm install --save express-session
-
-```
-
-
-Then we add it to the list of require statements
-
-
-`simple_login/app.js`
-
-```javascript
-var express = require('express'),
-    bodyParser = require('body-parser'),
-    db = require("./models"),
-    session = require("express-session"),
-    app = express();
-
-app.use(bodyParser.urlencoded({extended: true}));
-
-app.use(session({
-  secret: 'super secret',
-  resave: false,
-  saveUninitialized: true
-}))
-
-```
-
-Then your routes to see if they have a `set-cookie` header
-
-```
-curl --data "user[email]=foobar&user[password]=foobar" -i localhost:3000/signup
-curl --data "user[email]=foobar&user[password]=foobar" -i localhost:3000/login
-```
-
-
-Notice the headers have a `set-cookie` key and value. Now we can create some special login functionality to save a user's data in the session.
-
-`simple_login/app.js`
-
-```javascript
-
-app.use("/", function (req, res, next) {
-
-  req.login = function (user) {
-    req.session.userId = user.id;
-  };
-
-  req.currentUser = function (cb) {
-     db.User.
-      find({
-          id: req.session.userId
-      },
-      function (err, user) {
-        req.user = user;
-        cb(null, user);
-      })
-  };
-
-  req.logout = function () {
-    req.session.userId = null;
-    req.user = null;
+var todoSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    default: ""
+  },
+  description: {
+    type: String,
+    default: ""
+  },
+  completed: {
+    type: Boolean,
+    default: false
   }
-
-  next(); 
 });
 
+var Todo = mongoose.model("Todo", todoSchema);
+
+module.exports.Todo = Todo;
 ```
 
-## Logging In: Part 2 -- Routing
+Note that the last step will allow us to interact with the `Todo` model when we require this file later. Let's see that this works.
 
-In our app.js we want to make sure we have the correct routing for logging in a user so let's update our login route.
+Go into the node repl.
 
-`simple_login/app.js`
+
+```
+var db = require("./models");
+
+db.Todo.create({
+  title: "DO LAUNDRY",
+  description: "Two loads!"
+}, function (err, todo) {
+  console.log("TODO CREATED");
+  console.log(todo);
+});
+```
+
+It can be hard to do this every time you go into Node, so I make a little `console.js` file that does this for me.
+
+`console.js`
+
+```javascript
+var REPL = require("repl");
+var db = require("./models");
+
+var repl = REPL.start("Todo > ");
+repl.context.db = db;
+
+repl.on("exit", function () {
+  console.log("GOODBYE!!");
+  process.exit();
+});
+```
+
+We can then run this using 
+
+```bash
+node console.js
+```
+
+## Refactoring
+
+Let's add our `models.js` file to our application, `index.js`.
+
 
 ```javascript
 
-app.post("/login", function (req, res) {
-  var user = req.body.user;
+var db = require("./models");
 
-  db.User
-    .authenticate(user.email, user.password, function (err, user) {
-          res.send(user);
+```
+
+Then let's refactor `GET /todos`
+
+```javascript
+app.get("/todos", function (req, res) {
+  db.Todo.find({},
+    function (err, todos) {
+      res.send(todos);
+    });
+});
+```
+
+Then go to localhost:3000 to verify this is working.
+
+### CREATING
+
+Let's now refactor our `POST /todos`.
+
+```javascript
+
+app.post("/todos", function (req, res) {
+  db.Todo.create(req.body.todo, 
+    function (err, todo) {
+      res.send(201, todo);
     });
 });
 
 ```
 
-Technically after you log someone in you want to redirect them to somewhere meaningful.
+### Updating
 
+Let refactor the delete method
 
-`simple_login/app.js`
 
 ```javascript
-
-app.post("/login", function (req, res) {
-  var user = req.body.user;
-
-  db.User
-    .authenticate(user.email, user.password,
-    function (err, user) {
-          // note here the super step
-          req.login(user);
-          // We need to create this route
-          res.redirectTo("/profile"); // redirect to user profile
-      });
+app.update("/todos/:id", function (req, res) {
+  var todoData = req.body.todo;
+  db.Todo.findOne({
+    _id: req.params.id
+  }, function (err, todo) {
+    todo.completed = todoData.completed;
+    todo.save(function (err, todo) {
+      res.send(todo)
+    });
+  });
 });
-
 ```
 
-The user show path will be the following.
+### Clean Up
 
+Delete the old `todos` array. It's not needed. :D
 
-`simple_login/app.js`
-
-```javascript
-
-app.get("/profile", function (req, res) {
-  req.currentUser(function (err, user) {
-        res.send(user);
-   })
-});
-
-```
-
-However we need to play with this in the browser to verify this is working, so it's time to add some views.
-
-## Adding Views
-
-First we need to add `ejs`.
-
-```bash
-npm install --save ejs
-
-```
-
-Then we need to configure our middleware
-
-`simple_login/app.js`
-
-```javascript
-
-var express = require('express'),
-    bodyParser = require('body-parser'),
-    db = require("./models"),
-    session = require("express-session"),
-    app = express();
+* Go through all the `public/javascripts/app.js` code and change everywhere you see `index` to `_id`. Good luck!
 
 
 
-app.set("view engine", "ejs"); // <--- throw in ejs
-
-app.use(bodyParser.urlencoded({extended: true}));
-
-app.use(session({
-  secret: 'super secret',
-  resave: false,
-  saveUninitialized: true
-}));
-
-
-```
-
-Then `mkdir` for views
 
 
 
-### Adding A Login Path
-
-
-We need a `GET /login` view and route.
-
-
-`simple_login/app.js`
-
-```javascript
-
-app.get("/login", function (req, res) {
-  res.render("login");
-});
-
-```
-
-Then create the login view
-
-
-`simple_login/views/login.ejs`
-
-```html
-
-<form method="post" action="/login">
-  <div>
-    <input type="text" name="user[email]">
-  </div>
-  <div>
-    <input type="text" name="user[password]">
-  </div>
-  <button>Login</button>
-</form>
-
-```
-
-### Adding A Profile
-
-While we are at it let's add a real profile page.
-
-`simple_login/views/profile.ejs`
-
-```html
-
-  Welcome, <%= user.email %>!
-
-```
-
-Let's update the route to render this.
-
-
-`simple_login/app.js`
-
-```javascript
-
-app.get("/profile", function (req, res) {
-  req.currentUser(function (err, user) {
-        res.render("profile.ejs", {user: user});
-      });
-});
-
-```
 
 
 
-## Exercises
 
-1. Add a `GET /signup` route and view.
-2. Login a user after `signup` and redirect to `/profile`.
+
+
+
+
+
+
+
+
+
+
+
+
+

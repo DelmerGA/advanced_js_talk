@@ -151,29 +151,27 @@ Book.update({author: "Lewis Carroll"}, {description: "Trippy!"}, function (err, 
 Static methods exist on the class level of the model and is defined in the schema for each new model. For example, we can create a static method for our `User` that will create and obscure the User's password.
 
 
-```
-userSchema.statics.createSecure = function (params, cb) {
-	params.passwordDigest = "hashed text";
-	this.create(params, cb);
-})
+```javascript
 
-var User = mongoose.model("User", userSchema);
+BookSchema.statics.all = function (cb) {
+	this.find({}, cb);
+});
 
-User.createSecure({
-	email: "foo@bar.com",
-	password: "secret"
-})
+var Book = mongoose.model("Book", userSchema);
 
+Book.all(function (err, allBooks) {
+  console.log(allBooks);
+});
 ```
 
 An instance method can also be helpful to avoid repeating logic associated to particular instances. 
 
 
-```
+```javascript
 
-userSchema.methods.checkPassword = function (pswrd) {
-	return bcrypt.compareSync(password, this.passwordDigest);
-}
+BookSchema.methods.randomPage = function () {
+  return Math.round(this.num_of_pages*Math.random());
+};
 ```
 
 
@@ -208,19 +206,4 @@ Then we run it to see our data
 ```
 node node_modules/mongo-express/
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
