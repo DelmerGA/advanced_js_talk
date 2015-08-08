@@ -28,14 +28,18 @@
   * Using Node Modules
 
 
-## Recommended Readings
+## Recommended Resources
 
+* [Spike Brehm Isomorphic JS CONF 2014](https://www.youtube.com/watch?v=CH6icJbLhlI)
+* [Spike Brehm Isomorphic JS CONF ASIA 2014 Talk](https://www.youtube.com/watch?v=tcbcERdxjIc)
+* [Spike Brehm Blog Post](http://nerds.airbnb.com/isomorphic-javascript-future-web-apps/)
+* [Spike Brehm Tutorial](https://github.com/spikebrehm/isomorphic-tutorial)
 * [Grunt Getting Started](http://gruntjs.com/getting-started)
 * [NPM SCRIPTS!](http://blog.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/)
 * [Browserify Handbook](https://github.com/substack/browserify-handbook#introduction)
 * [Browserify Usage](https://github.com/substack/node-browserify#usage)
 * [Browserify Getting Started](http://www.sitepoint.com/getting-started-browserify/)
-
+* [Shimmy](http://josdejong.com/blog/2015/03/28/a-broader-view-on-isomorphic-javascript/)
 
 
 
