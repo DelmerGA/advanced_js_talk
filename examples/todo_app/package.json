@@ -1,0 +1,23 @@
+{
+  "name": "todo_app",
+  "version": "1.0.0",
+  "description": "a todo app",
+  "main": "server.js",
+  "scripts": {
+    "postinstall": "bower install"
+  },
+  "keywords": [
+    "todo"
+  ],
+  "author": "todo later",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.13.3",
+    "express": "^4.13.3",
+    "mongoose": "^4.1.1"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "mocha": "^2.2.5"
+  }
+}

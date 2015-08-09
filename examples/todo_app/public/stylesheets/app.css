@@ -1,0 +1,14 @@
+body {
+  background-color: #e74c3c;
+  color: white;
+}
+
+body .container .jumbotron {
+  background-color: #7f8c8d;
+  padding: 10px;
+  border-radius: 0;
+}
+
+form  {
+  color: black;
+}
