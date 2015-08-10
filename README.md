@@ -40,6 +40,6 @@
 * [Browserify Usage](https://github.com/substack/node-browserify#usage)
 * [Browserify Getting Started](http://www.sitepoint.com/getting-started-browserify/)
 * [Shimmy](http://josdejong.com/blog/2015/03/28/a-broader-view-on-isomorphic-javascript/)
-
+* [Node School](http://nodeschool.io/#workshoppers)
 
 
