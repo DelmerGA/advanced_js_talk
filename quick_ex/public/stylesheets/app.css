@@ -1,0 +1,11 @@
+.burger-create {
+  background-color: #59ABE3;
+  padding: 20px;
+}
+
+.todo {
+  border: solid black 1px;
+  margin-bottom: 20px;
+  min-height:  75px;
+}
+

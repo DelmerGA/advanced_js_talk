@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html ng-app="TodoApp">
+<head>
+  <title>Home</title>
+  <link rel="stylesheet" type="text/css" href="bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="stylesheets/app.css">
+
+  <script type="text/javascript" src="angular/angular.js"></script>
+
+  <script type="text/javascript" src="jquery/dist/jquery.js"></script>
+  <script type="text/javascript" src="bootstrap/dist/js/bootstrap.js"></script>
+
+  <script type="text/javascript" src="javascripts/app.js"></script>
+
+</head>
+<body>
+  <!-- CREATE A NEW BURGER! -->
+  <div class="container"  ng-controller="TodosCtrl as todo">
+    <div>
+    {{ newTodo }}
+    </div>
+
+    <form ng-submit='todo.createTodo()' class="col-xs-6 col-xs-offset-3 todo-create">
+        <div class="form-group">
+          <input class="form-control" type="text" ng-model="todo.newTodo.name" placeholder="Todo name?">
+        </div>
+
+        <div class="form-group">
+          <textarea class="form-control" type="text" ng-model="todo.newTodo.description" placeholder="Todo name?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <input class="form-control" type="checkbox" ng-model="todo.newTodo.completed" placeholder="Todo name?">
+        </div>
+        <button class="btn-primary">CREATE TODO</button>
+    </form>
+
+    <div id="todosCon" class="col-xs-12">
+      <div class="todo col-xs-offset-3 col-xs-6" ng-repeat="td in todo.todos track by $index">
+          <div>{{td.name}} </div>
+          <div> {{td.description}} </div>
+          <div>
+            <input type="checkbox" ng-model="td.completed" ng-click="todo.update(td)">
+          </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
